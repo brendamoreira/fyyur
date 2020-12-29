@@ -239,7 +239,6 @@ def create_venue_form():
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
   data = request.form
-  error = False
   try:
     venue = Venue(
       name=data['name'],
@@ -254,16 +253,12 @@ def create_venue_submission():
     db.session.commit()
     # on successful db insert, flash success
     flash('Venue ' + request.form['name'] + ' was successfully listed!')
-  except Exception as err:
-    error = True
+  except:
     # on unsuccessful db insert, flash an error instead.
     flash('Venue' + data['name'] + 'could not be saved!', 'error')
     db.session.rollback()
   finally:
     db.session.close()
-  
-  if error:
-    return render_template('forms/new_venue.html', form=data)
   
   return render_template('pages/home.html')
 
@@ -448,7 +443,6 @@ def create_artist_form():
 def create_artist_submission():
   # called upon submitting the new artist listing form
   data = request.form
-  error = False
   try:
     artist = Artist(
       name=data['name'],
@@ -465,18 +459,12 @@ def create_artist_submission():
 
     # on successful db insert, flash success
     flash('Artist ' + request.form['name'] + ' was successfully listed!')
-  except Exception as err:
-    error = True
+  except:
     # on unsuccessful db insert, flash an error instead.
     flash('An error occurred. Artist ' + data['name'] + ' could not be listed.', 'error')
-    logging.error(err)
     db.session.rollback()
   finally:
     db.session.close()
-  
-  if error:
-    form = ArtistForm()
-    return render_template('forms/new_artist.html', form=form, artist=artist)
   
   return render_template('pages/home.html')
 
@@ -538,15 +526,28 @@ def create_shows():
 
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
-  # called to create new shows in the db, upon submitting new show listing form
+	data = request.form
+	# called to create new shows in the db, upon submitting new show listing form
   # TODO: insert form data as a new Show record in the db, instead
-
-  # on successful db insert, flash success
-  flash('Show was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Show could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
-  return render_template('pages/home.html')
+	try:
+		show = Show(
+			artist_id=data['artist_id'],
+			venue_id=data['venue_id'],
+			date=data['date'],
+		)
+		db.session.add(show)
+		db.session.commit()
+		# on successful db insert, flash success
+		flash('Show was successfully listed!')
+	except Exception as err:
+		# on unsuccessful db insert, flash an error instead.
+		# e.g., flash('An error occurred. Show could not be listed.')
+		logging.error(err)
+		flash('An error occurred. Show could not be listed.')
+		db.session.rollback()
+	finally:
+		db.session.close()
+	return render_template('pages/home.html')
 
 @app.errorhandler(404)
 def not_found_error(error):

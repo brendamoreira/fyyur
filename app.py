@@ -438,13 +438,32 @@ def edit_venue(venue_id):
   #   "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",
   #   "image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60"
   # }
-  # TODO: populate form with values from venue with ID <venue_id>
+  # populates form with values from venue with ID <venue_id>
   return render_template('forms/edit_venue.html', form=form, venue=venue)
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
   # TODO: take values from the form submitted, and update existing
   # venue record with ID <venue_id> using the new attributes
+  data = request.form
+  venue = Venue.query.get(venue_id)
+  try:
+    venue.name=data['name']
+    venue.city=data['city']
+    venue.state=data['state']
+    venue.address=data['address']
+    venue.phone=data['phone']
+    venue.genres=data['genres']
+    venue.image_link=data['image_link']
+    venue.facebook_link=data['facebook_link']
+    db.session.commit()
+    flash('Venue ' + request.form['name'] + ' was successfully edited!')
+  except:
+    flash('Venue' + data['name'] + 'could not be saved!', 'error')
+    db.session.rollback()
+  finally:
+    db.session.close()
+
   return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Create Artist

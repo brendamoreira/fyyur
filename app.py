@@ -463,11 +463,12 @@ def edit_venue_submission(venue_id):
     venue.image_link=data['image_link']
     venue.facebook_link=data['facebook_link']
     venue.website=data['website']
-    venue.seeking_talent=['seeking_talent']
-    venue.seeking_description['seeking_description']
+    venue.seeking_talent=True if data['seeking_talent']=='y' else False 
+    venue.seeking_description=data['seeking_description']
     db.session.commit()
     flash('Venue ' + request.form['name'] + ' was successfully edited!')
-  except:
+  except Exception as err:
+    logging.error(err)
     flash('Venue' + data['name'] + 'could not be saved!', 'error')
     db.session.rollback()
   finally:

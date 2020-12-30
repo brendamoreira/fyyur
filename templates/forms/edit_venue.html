@@ -40,6 +40,18 @@
         <label for="facebook_link">Facebook Link</label>
         {{ form.facebook_link(class_ = 'form-control', placeholder='http://', autofocus = true) }}
       </div>
+      <div class="form-group">
+        <label for="website">Website</label>
+        {{ form.website(class_ = 'form-control', placeholder='http://', autofocus = true) }}
+      </div>
+      <div class="form-group">
+        <label for="seeking_talent">Seeking Talent</label>
+        {{ form.seeking_telent(autofocus = true) }}
+      </div>
+      <div class="form-group">
+        <label for="seeking_description"> Seeking Description</label>
+        {{ form.seeking_description(placeholder= 'Description', autofocus = true) }}
+      </div>
       <input type="submit" value="Edit Venue" class="btn btn-primary btn-lg btn-block">
     </form>
   </div>

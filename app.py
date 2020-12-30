@@ -43,6 +43,9 @@ class Venue(db.Model):
     phone = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+    website = db.Column(db.String(120))
+    seeking_talent = db.Column(db.Boolean, default=True)
+    seeking_description = db.Column(db.String(120))
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -255,6 +258,9 @@ def create_venue_submission():
       phone=data['phone'],
       image_link=data['image_link'],
       facebook_link=data['facebook_link'],
+      website=data['website'],
+      seeking_talent=data['seeking_talent'],
+      seeking_description=data['seeking_description'],
     )
     db.session.add(venue)
     db.session.commit()
@@ -443,7 +449,7 @@ def edit_venue(venue_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-  # TODO: take values from the form submitted, and update existing
+  # takes values from the form submitted, and update existing
   # venue record with ID <venue_id> using the new attributes
   data = request.form
   venue = Venue.query.get(venue_id)
@@ -456,6 +462,9 @@ def edit_venue_submission(venue_id):
     venue.genres=data['genres']
     venue.image_link=data['image_link']
     venue.facebook_link=data['facebook_link']
+    venue.website=data['website']
+    venue.seeking_talent=['seeking_talent']
+    venue.seeking_description['seeking_description']
     db.session.commit()
     flash('Venue ' + request.form['name'] + ' was successfully edited!')
   except:

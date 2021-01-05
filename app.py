@@ -37,7 +37,7 @@ class Venue(db.Model):
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
     address = db.Column(db.String(120))
-    genres = db.Column(db.String(120))
+    genres = db.Column(db.ARRAY(db.String))
     phone = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
@@ -247,7 +247,7 @@ def create_venue_submission():
       city=data['city'],
       state=data['state'],
       address=data['address'],
-      genres=data['genres'],
+      genres=data.getlist('genres'),
       phone=data['phone'],
       image_link=data['image_link'],
       facebook_link=data['facebook_link'],
@@ -467,7 +467,7 @@ def edit_venue_submission(venue_id):
     venue.state=data['state']
     venue.address=data['address']
     venue.phone=data['phone']
-    venue.genres=data['genres']
+    venue.genres=data.getlist('genres')
     venue.image_link=data['image_link']
     venue.facebook_link=data['facebook_link']
     venue.website=data['website']

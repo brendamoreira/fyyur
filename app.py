@@ -583,7 +583,7 @@ def create_show_submission():
 		show = Show(
 			artist_id=data['artist_id'],
 			venue_id=data['venue_id'],
-			date=data['date'],
+			start_time=data['start_time'],
 		)
 		db.session.add(show)
 		db.session.commit()

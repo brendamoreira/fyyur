@@ -53,15 +53,12 @@ class Artist(db.Model):
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
     phone = db.Column(db.String(120))
-    genres = db.Column(db.String(120))
+    genres = db.Column(db.ARRAY(db.String))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
-    seek_venue = db.Column(db.Boolean, nullable=False, default=True)
-    seek_description = db.Column(db.String(120), nullable=True)
-
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
+    website = db.Column(db.String(120))
+    seeking_venue = db.Column(db.Boolean)
+    seeking_description = db.Column(db.String(120), nullable=True)
 
 class Show(db.Model):
     __tablename__ = 'Show'
@@ -417,11 +414,12 @@ def edit_artist_submission(artist_id):
     artist.city=data['city']
     artist.state=data['state']
     artist.phone=data['phone']
-    artist.genres=data['genres']
+    artist.genres=data.getlist('genres')
     artist.image_link=data['image_link']
     artist.facebook_link=data['facebook_link']
-    artist.seek_venue=True if data['seek_venue']=='y' else False
-    artist.seek_description=data['seek_description']
+    artist.website=data['website']
+    artist.seeking_venue=True if data['seeking_venue']=='y' else False
+    artist.seeking_description=data['seeking_description']
     db.session.commit()
     flash('Artist ' + request.form['name'] + ' was successfully edited!')
   except Exception as err:
@@ -501,11 +499,13 @@ def create_artist_submission():
       name=data['name'],
       city=data['city'],
       state=data['state'],
-      genres=data['genres'],
+      genres=data.getlist('genres'),
       phone=data['phone'],
       image_link=data['image_link'],
       facebook_link=data['facebook_link'],
-      seek_venue=True if data['seek_venue'] == 'y' else False,
+      website=data['website'],
+      seeking_venue=True if data['seeking_venue'] == 'y' else False,
+      seeking_description=data['seeking_description'],
     )
     db.session.add(artist)
     db.session.commit()

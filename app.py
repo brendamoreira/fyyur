@@ -178,15 +178,16 @@ def create_venue_submission():
       image_link=data['image_link'],
       facebook_link=data['facebook_link'],
       website=data['website'],
-      seeking_talent=data['seeking_talent'],
+      seeking_talent=True if data['seeking_talent'] == 'y' else False,
       seeking_description=data['seeking_description'],
     )
     db.session.add(venue)
     db.session.commit()
     # on successful db insert, flash success
     flash('Venue ' + request.form['name'] + ' was successfully listed!')
-  except:
+  except Exception as err:
     # on unsuccessful db insert, flash an error instead.
+    logging.error(err)
     flash('Venue' + data['name'] + 'could not be saved!', 'error')
     db.session.rollback()
   finally:

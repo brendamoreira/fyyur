@@ -45,7 +45,7 @@ class Venue(db.Model):
     website = db.Column(db.String(120))
     seeking_talent = db.Column(db.Boolean, default=True)
     seeking_description = db.Column(db.String(120))
-
+    shows=db.relationship('Show', backref='venue', passive_deletes=True)
 class Artist(db.Model):
     __tablename__ = 'Artist'
 
@@ -67,10 +67,9 @@ class Show(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     start_time = db.Column(db.DateTime, nullable=False)
     artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
-    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
+    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id', ondelete="cascade"), nullable=False)
 
     artist = db.relationship('Artist', backref='shows', lazy=False)
-    venue = db.relationship('Venue', backref='shows', lazy=False)
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -100,11 +99,14 @@ def index():
 
 @app.route('/venues')
 def venues():
+  
   data = []
   areas = db.session.query(Venue.city, Venue.state).distinct(Venue.city, Venue.state).all()
   for area in areas:
-    venues = [{'id': v[0], 'name': v[1], 'num_upcoming_shows': Show.query.filter(Show.venue_id == v[0], Show.start_time > datetime.now()).count()} for v in Venue.query.with_entities(Venue.id, Venue.name).filter(Venue.city == area[0], Venue.state == area[1]).all()]
-    logging.error(venues)
+    venues = [
+      {'id': v[0], 'name': v[1], 'num_upcoming_shows': Show.query.filter(Show.venue_id == v[0], Show.start_time > datetime.now()).count()}
+      for v in Venue.query.with_entities(Venue.id, Venue.name).filter(Venue.city == area[0], Venue.state == area[1]).all()
+    ]
     data.append({'city':area[0], 'state':area[1], 'venues':venues})
  
   return render_template('pages/venues.html', areas=data);
@@ -176,18 +178,17 @@ def delete_venue(venue_id):
   try:
     Venue.query.filter_by(id=venue_id).delete()
     db.session.commit()
-
-  except:
+  except Exception as e:
     db.session.rollback()
+    logging.error(e)
     flash('Venue could not be deleted!', 'error')
-
+    return '', 500
   finally:
     db.session.close()
 
-  return render_template('pages/home.html')
+  return '', 200
   # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
   # clicking that button delete it from the db then redirect the user to the homepage
-  return None
 
 #  Artists
 #  ----------------------------------------------------------------

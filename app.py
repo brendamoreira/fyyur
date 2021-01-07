@@ -123,29 +123,24 @@ def venues():
   #   }]
   # }]
 
-  data=Venue.query.all()
-  if not data:
-    return render_template('errors/404.html')
 
-  # +.order_by('num_upcoming_shows')
+  # data=db.session.query(Venue.city, Venue.state).group_by(Venue.city).distinct()
+  data = []
+  areas = db.session.query(Venue.city, Venue.state).distinct(Venue.city, Venue.state).all()
+  for area in areas:
+    venues = [{'id': v[0], 'name': v[1]} for v in Venue.query.with_entities(Venue.id, Venue.name).filter(Venue.city == area[0], Venue.state == area[1]).all()]
+    data.append({'city':area[0], 'state':area[1], 'venues':venues})
+ 
   return render_template('pages/venues.html', areas=data);
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
   search_term=request.form.get('search_term', '')
-  # implement search on artists with partial string search. Ensure it is case-insensitive.
+  # implements search on venue with partial string search, case-insensitive.
 
   result = Venue.query.filter(Venue.name.ilike('%' + search_term + '%')).all()
   response = {"count": len(result), "data": result}
-	# {
-  #   "count": 1,
-  #   "data": [{
-  #     "id": 2,
-  #     "name": "The Dueling Pianos Bar",
-  #     "num_upcoming_shows": 0,
-  #   }]
-  # }
-	#TODO: ATUALIZAR QDO FIZER UPCOMING SHOW
+	
   return render_template('pages/search_venues.html', results=response, search_term=request.form.get('search_term', ''))
 
 @app.route('/venues/<int:venue_id>')

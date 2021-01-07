@@ -344,16 +344,8 @@ def create_artist_submission():
 @app.route('/shows')
 def shows():
   # displays list of shows at /shows
-  # TODO: replace with real venues data.
-  #       num_shows should be aggregated based on number of upcoming shows per venue.
-  
-  data = []
-  shows = db.session.query(Show).distinct(Venue.city, Venue.state).all()
-  for show in shows:
-    show = [{'id': v[0], 'name': v[1], 'num_upcoming_shows': Show.query.filter(Show.venue_id == v[0], Show.start_time > datetime.now()).count()} for v in Venue.query.with_entities(Venue.id, Venue.name).filter(Venue.city == area[0], Venue.state == area[1]).all()]
-    logging.error(shows)
-    data.append({'city':area[0], 'state':area[1], 'venues':venues})
-  
+  data = Show.query.join(Venue).join(Artist).all()
+  logging.error(data)  
   return render_template('pages/shows.html', shows=data)
 
 @app.route('/shows/search', methods=['POST'])

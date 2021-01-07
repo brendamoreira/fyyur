@@ -163,7 +163,6 @@ def create_venue_form():
   form = VenueForm()
   return render_template('forms/new_venue.html', form=form)
 
-# TODO: modify data to be the data object returned from db insertion
 # TODO: implement genre and venue relationship (many to many)
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
@@ -220,15 +219,7 @@ def search_artists():
   
   result = Artist.query.filter(Artist.name.ilike('%' + search_term + '%')).all()
   response = {"count": len(result), "data": result}
-	# response={
-  #   "count": 1,
-  #   "data": [{
-  #     "id": 4,
-  #     "name": "Guns N Petals",
-  #     "num_upcoming_shows": 0,
-  #   }]
-  # }
-  #TODO: ATUALIZAR QDO FIZER UPCOMING SHOW
+	
   return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
 
 @app.route('/artists/<int:artist_id>')
@@ -254,20 +245,7 @@ def edit_artist(artist_id):
   form = ArtistForm(obj=artist)
   if not artist:
     return render_template('errors/404.html')
-
-    # "id": 4,
-    # "name": "Guns N Petals",
-    # "genres": ["Rock n Roll"],
-    # "city": "San Francisco",
-    # "state": "CA",
-    # "phone": "326-123-5000",
-    # "website": "https://www.gunsnpetalsband.com",
-    # "facebook_link": "https://www.facebook.com/GunsNPetals",
-    # "seeking_venue": True,
-    # "seeking_description": "Looking for shows to perform at in the San Francisco Bay Area!",
-    # "image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80"
-  
-  # TODO: populate form with fields from artist with ID <artist_id>
+    
   return render_template('forms/edit_artist.html', form=form, artist=artist)
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
@@ -302,21 +280,7 @@ def edit_venue(venue_id):
   form = VenueForm(obj=venue)
   if not venue:
     return render_template('errors/404.html')
-  # venue={
-  #   "id": 1,
-  #   "name": "The Musical Hop",
-  #   "genres": ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
-  #   "address": "1015 Folsom Street",
-  #   "city": "San Francisco",
-  #   "state": "CA",
-  #   "phone": "123-123-1234",
-  #   "website": "https://www.themusicalhop.com",
-  #   "facebook_link": "https://www.facebook.com/TheMusicalHop",
-  #   "seeking_talent": True,
-  #   "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",
-  #   "image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60"
-  # }
-  # populates form with values from venue with ID <venue_id>
+  
   return render_template('forms/edit_venue.html', form=form, venue=venue)
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])

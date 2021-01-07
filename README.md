@@ -1,4 +1,5 @@
 Fyyur
+The starter code can be found here: https://github.com/udacity/FSND/tree/master/projects/01_fyyur/starter_code
 -----
 
 ## Introduction

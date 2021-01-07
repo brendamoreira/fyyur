@@ -141,7 +141,6 @@ def create_venue_form():
   form = VenueForm()
   return render_template('forms/new_venue.html', form=form)
 
-# TODO: implement genre and venue relationship (many to many)
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
   data = request.form

@@ -2,16 +2,17 @@
 {% block title %}Fyyur | Shows Search{% endblock %}
 {% block content %}
 <h3>Number of search results for "{{ search_term }}": {{ results.count }}</h3>
-<ul class="items">
+<section class="items">
 	{% for show in results.data %}
-	<li>
-		<a href="/show/{{ show.id }}">
-			<i class="fas fa-music"></i>
-			<div class="item">
-				<h5>{{ show.artist.name }}</h5>
-			</div>
-		</a>
-	</li>
+	<div class="col-sm-4">
+        <div class="tile tile-show">
+            <img src="{{ show.artist.image_link }}" alt="Artist Image" />
+            <h4>{{ show.start_time|datetime('full') }}</h4>
+            <h5><a href="/artists/{{ show.artist.id }}">{{ show.artist.name }}</a></h5>
+            <p>playing at</p>
+            <h5><a href="/venues/{{ show.venue.id }}">{{ show.venue.name }}</a></h5>
+        </div>
+    </div>
 	{% endfor %}
-</ul>
+</section>
 {% endblock %}

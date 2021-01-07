@@ -72,8 +72,18 @@
 			</div>
 		</div>
 		{% endfor %}
-	</div>
+		</div>
+	<button id="deletebtn" class="btn btn-danger" data-id="{{ venue.id }}" onclick="deleteVenue()">Delete this Venue</button>
 </section>
-
+<script>
+	const deleteBtn = document.querySelector('#deletebtn');
+	function deleteVenue(){
+		fetch('/venues/' + deleteBtn.dataset['id'], {
+			method: 'DELETE'
+		}).then(function(){
+			window.location.href="/";
+		});
+	}
+</script>
 {% endblock %}
 

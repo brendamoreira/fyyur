@@ -63,14 +63,18 @@ def index():
 def venues():
   
   data = []
-  areas = db.session.query(Venue.city, Venue.state).distinct(Venue.city, Venue.state).all()
+  venues = Venue.query.all()
+  areas = db.session.query(Venue.city, Venue.state).all()
   for area in areas:
-    venues = [
-      {'id': v[0], 'name': v[1], 'num_upcoming_shows': Show.query.filter(Show.venue_id == v[0], Show.start_time > datetime.now()).count()}
-      for v in Venue.query.with_entities(Venue.id, Venue.name).filter(Venue.city == area[0], Venue.state == area[1]).all()
-    ]
-    data.append({'city':area[0], 'state':area[1], 'venues':venues})
- 
+    data.append({
+        'city': area.city,
+        'state': area.state,
+        'venues': [{
+            'id': venue.id,
+            'name': venue.name,
+        } for venue in venues if
+            venue.city == area.city and venue.state == area.state]
+    })
   return render_template('pages/venues.html', areas=data);
 
 @app.route('/venues/search', methods=['POST'])

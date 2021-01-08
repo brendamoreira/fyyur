@@ -346,7 +346,7 @@ def create_show_submission():
 		db.session.commit()
 		# on successful db insert, flash success
 		flash('Show was successfully listed!')
-	except:
+	except Exception as err:
 		# on unsuccessful db insert, flash an error.
 		# e.g., flash('An error occurred. Show could not be listed.')
 		logging.error(err)

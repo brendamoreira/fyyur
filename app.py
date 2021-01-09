@@ -191,14 +191,37 @@ def search_artists():
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
     
-  artist = Artist.query.get(artist_id)
-  if not artist:
-    return render_template('errors/404.html')
+  past_shows = db.session.query(Venue, Show).join(Show).join(Artist).\
+    filter(
+        Show.venue_id == Venue.id,
+        Show.artist_id == artist_id,
+        Show.start_time < datetime.now()
+    ).\
+    all()
+  upcoming_shows = db.session.query(Venue, Show).join(Show).join(Artist).\
+    filter(
+        Show.venue_id == Venue.id,
+        Show.artist_id == artist_id,
+        Show.start_time > datetime.now()
+    ).\
+    all()
+  artist = Artist.query.filter_by(id=artist_id).first_or_404()
+  data = artist.__dict__
+  data['past_shows'] = [{
+            'venue_id': venue.id,
+            "venue_name": venue.name,
+            "venue_image_link": venue.image_link,
+            "start_time": show.start_time.strftime("%m/%d/%Y, %H:%M")
+        } for venue, show in past_shows]
 
-  artist.upcoming_shows = Show.query.with_parent(artist).filter(Show.start_time > datetime.now())
-  artist.upcoming_shows_count = artist.upcoming_shows.count()
-  artist.past_shows = Show.query.with_parent(artist).filter(Show.start_time <= datetime.now())
-  artist.past_shows_count = artist.past_shows.count()
+  data['upcoming_shows'] = [{
+            'venue_id': venue.id,
+            'venue_name': venue.name,
+            'venue_image_link': venue.image_link,
+            'start_time': show.start_time.strftime("%m/%d/%Y, %H:%M")
+        } for venue, show in upcoming_shows]
+  data['past_shows_count'] = len(past_shows)
+  data['upcoming_shows_count'] = len(upcoming_shows)
   
   return render_template('pages/show_artist.html', artist=artist)
 

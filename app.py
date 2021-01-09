@@ -293,28 +293,24 @@ def create_shows():
 
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
-	data = request.form
-	# called to create new shows in the db, upon submitting new show listing form
-  # inserts form data as a new Show record in the db
-	try:
-		show = Show(
-			artist_id=data['artist_id'],
-			venue_id=data['venue_id'],
-			start_time=data['start_time'],
-		)
-		db.session.add(show)
-		db.session.commit()
+  form = ShowForm(request.form)
+
+  try:
+    show = Show()
+    form.populate_obj(show)
+    db.session.add(show)
+    db.session.commit()
 		# on successful db insert, flash success
-		flash('Show was successfully listed!')
-	except Exception as err:
+    flash('Show was successfully listed!')
+  except Exception as err:
 		# on unsuccessful db insert, flash an error.
 		# e.g., flash('An error occurred. Show could not be listed.')
-		logging.error(err)
-		flash('An error occurred. Show could not be listed.')
-		db.session.rollback()
-	finally:
-		db.session.close()
-	return render_template('pages/home.html')
+    logging.error(err)
+    flash('An error occurred. Show could not be listed.')
+    db.session.rollback()
+  finally:
+    db.session.close()
+  return render_template('pages/home.html')
 
 @app.errorhandler(404)
 def not_found_error(error):

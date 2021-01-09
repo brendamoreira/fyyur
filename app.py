@@ -245,18 +245,24 @@ def edit_artist(artist_id):
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
   
-  form = ArtistForm(request.form)
-  try:
-    artist = Artist()
-    form.populate_obj(artist)
-    db.session.commit()
-    flash('Artist ' + request.form['name'] + ' was successfully edited!')
-  except Exception as err:
-    flash('Artist' + data['name'] + 'could not be saved!', 'error')
-    logging.error(err)
-    db.session.rollback()
-  finally:
-    db.session.close()
+  form = ArtistForm(request.form, meta={'csrf': False})
+  if form.validate():
+    try:
+      artist = Artist()
+      form.populate_obj(artist)
+      db.session.commit()
+      flash('Artist ' + request.form['name'] + ' was successfully edited!')
+    except Exception as err:
+      flash('Artist' + data['name'] + 'could not be saved!', 'error')
+      logging.error(err)
+      db.session.rollback()
+    finally:
+      db.session.close()
+  else:
+    message = []
+    for field, err in form.errors.items():
+        message.append(field + ' ' + '|'.join(err))
+    flash('Errors ' + str(message))
   return redirect(url_for('show_artist', artist_id=artist_id))
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
@@ -303,21 +309,26 @@ def create_artist_form():
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
   # called upon submitting the new artist listing form
-  form = ArtistForm(request.form)
-  try:
-    artist = Artist()
-    form.populate_obj(artist)
-    db.session.add(artist)
-    db.session.commit()
-    # on successful db insert, flash success
-    flash('Artist ' + request.form['name'] + ' was successfully listed!')
-  except:
-    # on unsuccessful db insert, flash an error instead.
-    flash('An error occurred. Artist ' + data['name'] + ' could not be listed.', 'error')
-    db.session.rollback()
-  finally:
-    db.session.close()
-  
+  form = ArtistForm(request.form, meta={'csrf': False})
+  if form.validate():
+    try:
+      artist = Artist()
+      form.populate_obj(artist)
+      db.session.add(artist)
+      db.session.commit()
+      # on successful db insert, flash success
+      flash('Artist ' + request.form['name'] + ' was successfully listed!')
+    except:
+      # on unsuccessful db insert, flash an error instead.
+      flash('An error occurred. Artist ' + data['name'] + ' could not be listed.', 'error')
+      db.session.rollback()
+    finally:
+      db.session.close()
+  else:
+    message = []
+    for field, err in form.errors.items():
+        message.append(field + ' ' + '|'.join(err))
+    flash('Errors ' + str(message))
   return render_template('pages/home.html')
 
 

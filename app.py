@@ -193,19 +193,10 @@ def edit_artist(artist_id):
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
   
-  data = request.form
-  artist = Artist.query.get(artist_id)
+  form = ArtistForm(request.form)
   try:
-    artist.name=data['name']
-    artist.city=data['city']
-    artist.state=data['state']
-    artist.phone=data['phone']
-    artist.genres=data.getlist('genres')
-    artist.image_link=data['image_link']
-    artist.facebook_link=data['facebook_link']
-    artist.website=data['website']
-    artist.seeking_venue=True if data['seeking_venue']=='y' else False
-    artist.seeking_description=data['seeking_description']
+    artist = Artist()
+    form.populate_obj(artist)
     db.session.commit()
     flash('Artist ' + request.form['name'] + ' was successfully edited!')
   except Exception as err:
@@ -255,23 +246,12 @@ def create_artist_form():
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
   # called upon submitting the new artist listing form
-  data = request.form
+  form = ArtistForm(request.form)
   try:
-    artist = Artist(
-      name=data['name'],
-      city=data['city'],
-      state=data['state'],
-      genres=data.getlist('genres'),
-      phone=data['phone'],
-      image_link=data['image_link'],
-      facebook_link=data['facebook_link'],
-      website=data['website'],
-      seeking_venue=True if data['seeking_venue'] == 'y' else False,
-      seeking_description=data['seeking_description'],
-    )
+    artist = Artist()
+    form.populate_obj(artist)
     db.session.add(artist)
     db.session.commit()
-
     # on successful db insert, flash success
     flash('Artist ' + request.form['name'] + ' was successfully listed!')
   except:

@@ -18,6 +18,7 @@ from flask import (
 from flask_migrate import Migrate
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
+from forms import VenueForm, ArtistForm, ShowForm
 import logging
 from logging import Formatter, FileHandler
 from models import db, Venue, Artist, Show
@@ -109,21 +110,10 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  data = request.form
+  form = VenueForm(request.form)
   try:
-    venue = Venue(
-      name=data['name'],
-      city=data['city'],
-      state=data['state'],
-      address=data['address'],
-      genres=data.getlist('genres'),
-      phone=data['phone'],
-      image_link=data['image_link'],
-      facebook_link=data['facebook_link'],
-      website=data['website'],
-      seeking_talent=True if data['seeking_talent'] == 'y' else False,
-      seeking_description=data['seeking_description'],
-    )
+    venue = Venue()
+    form.populate_obj(venue)
     db.session.add(venue)
     db.session.commit()
     # on successful db insert, flash success
@@ -239,20 +229,10 @@ def edit_venue(venue_id):
 def edit_venue_submission(venue_id):
   # takes values from the form submitted, and update existing
   # venue record with ID <venue_id> using the new attributes
-  data = request.form
-  venue = Venue.query.get(venue_id)
+  form = VenueForm(request.form)
   try:
-    venue.name=data['name']
-    venue.city=data['city']
-    venue.state=data['state']
-    venue.address=data['address']
-    venue.phone=data['phone']
-    venue.genres=data.getlist('genres')
-    venue.image_link=data['image_link']
-    venue.facebook_link=data['facebook_link']
-    venue.website=data['website']
-    venue.seeking_talent=True if data['seeking_talent']=='y' else False 
-    venue.seeking_description=data['seeking_description']
+    venue = Venue()
+    form.populate_obj(venue)
     db.session.commit()
     flash('Venue ' + request.form['name'] + ' was successfully edited!')
   except Exception as err:

@@ -134,22 +134,27 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  form = VenueForm(request.form)
-  try:
-    venue = Venue()
-    form.populate_obj(venue)
-    db.session.add(venue)
-    db.session.commit()
-    # on successful db insert, flash success
-    flash('Venue ' + request.form['name'] + ' was successfully listed!')
-  except Exception as err:
-    # on unsuccessful db insert, flash an error instead.
-    logging.error(err)
-    flash('Venue' + data['name'] + 'could not be saved!', 'error')
-    db.session.rollback()
-  finally:
-    db.session.close()
-  
+  form = VenueForm(request.form, meta={'csrf': False})
+  if form.validate():
+    try:
+      venue = Venue()
+      form.populate_obj(venue)
+      db.session.add(venue)
+      db.session.commit()
+      # on successful db insert, flash success
+      flash('Venue ' + request.form['name'] + ' was successfully listed!')
+    except Exception as err:
+      # on unsuccessful db insert, flash an error instead.
+      logging.error(err)
+      flash('Venue' + data['name'] + 'could not be saved!', 'error')
+      db.session.rollback()
+    finally:
+      db.session.close()
+  else:
+    message = []
+    for field, err in form.errors.items():
+        message.append(field + ' ' + '|'.join(err))
+    flash('Errors ' + str(message))
   return render_template('pages/home.html')
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])

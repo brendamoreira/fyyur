@@ -272,19 +272,24 @@ def edit_venue(venue_id):
 def edit_venue_submission(venue_id):
   # takes values from the form submitted, and update existing
   # venue record with ID <venue_id> using the new attributes
-  form = VenueForm(request.form)
-  try:
-    venue = Venue()
-    form.populate_obj(venue)
-    db.session.commit()
-    flash('Venue ' + request.form['name'] + ' was successfully edited!')
-  except Exception as err:
-    logging.error(err)
-    flash('Venue' + data['name'] + 'could not be saved!', 'error')
-    db.session.rollback()
-  finally:
-    db.session.close()
-
+  form = VenueForm(request.form, meta={'csrf': False})
+  if form.validate():
+    try:
+      venue = Venue()
+      form.populate_obj(venue)
+      db.session.commit()
+      flash('Venue ' + request.form['name'] + ' was successfully edited!')
+    except Exception as err:
+      logging.error(err)
+      flash('Venue' + data['name'] + 'could not be saved!', 'error')
+      db.session.rollback()
+    finally:
+      db.session.close()
+  else:
+    message = []
+    for field, err in form.errors.items():
+        message.append(field + ' ' + '|'.join(err))
+    flash('Errors ' + str(message))
   return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Create Artist
